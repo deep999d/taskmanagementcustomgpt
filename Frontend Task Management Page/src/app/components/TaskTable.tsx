@@ -292,6 +292,11 @@ export function TaskTable({ tasks, onUpdateTask, onDeleteTask, onAddTask, canAdd
     return task.dueDate && task.dueDate < new Date() && task.status !== 'Closed';
   };
 
+  const getDaysOpen = (timestamp: Date) => {
+    const days = Math.floor((new Date().getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24));
+    return days;
+  };
+
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="size-4 ml-1 text-gray-400" />;
     if (sortDirection === 'asc') return <ArrowUp className="size-4 ml-1 text-blue-600" />;
@@ -581,6 +586,12 @@ export function TaskTable({ tasks, onUpdateTask, onDeleteTask, onAddTask, canAdd
                       <SortIcon field="timestamp" />
                     </div>
                   </TableHead>
+                  <TableHead className="cursor-pointer hover:bg-gray-50" onClick={() => handleSort('timestamp')}>
+                    <div className="flex items-center">
+                      Days Old
+                      <SortIcon field="timestamp" />
+                    </div>
+                  </TableHead>
                   <TableHead className="cursor-pointer hover:bg-gray-50" onClick={() => handleSort('project')}>
                     <div className="flex items-center">
                       Project
@@ -642,7 +653,7 @@ export function TaskTable({ tasks, onUpdateTask, onDeleteTask, onAddTask, canAdd
               <TableBody>
                 {filteredAndSortedTasks.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={12} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={13} className="text-center text-gray-500 py-8">
                       No tasks found matching your filters
                     </TableCell>
                   </TableRow>
@@ -651,6 +662,11 @@ export function TaskTable({ tasks, onUpdateTask, onDeleteTask, onAddTask, canAdd
                     <TableRow key={task.id} className={isOverdue(task) ? 'bg-red-50' : ''}>
                       <TableCell className="text-sm text-gray-600">
                         {task.timestamp.toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <span className={getDaysOpen(task.timestamp) > 7 ? 'text-red-600 font-semibold' : ''}>
+                          {getDaysOpen(task.timestamp)}
+                        </span>
                       </TableCell>
                       <TableCell className="font-medium">{task.project}</TableCell>
                       <TableCell>{task.area || <span className="text-gray-400">-</span>}</TableCell>
