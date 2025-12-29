@@ -61,6 +61,18 @@ try {
 
   copyRecursiveSync(distDir, publicDir);
 
+  // Create a package.json in public to tell Vercel this is a static site (not serverless)
+  // This prevents Vercel from looking for server entrypoints in the output directory
+  const publicPackageJson = {
+    "name": "static-site",
+    "version": "1.0.0",
+    "private": true
+  };
+  fs.writeFileSync(
+    path.join(publicDir, 'package.json'),
+    JSON.stringify(publicPackageJson, null, 2)
+  );
+
   console.log('Build completed successfully!');
   process.exit(0);
 } catch (error) {
